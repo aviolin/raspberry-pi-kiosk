@@ -18,7 +18,7 @@ const isModalOpen = ref(false);
 <template>
     <button class="item-card" @click="isModalOpen = true">
         <div class="image-holder">
-            <img :src="item.image" :alt="item.name" />
+            <img :src="item.thumbnail" :alt="item.name" />
             <!-- <button class="btn-like" aria-label="Like"></button> -->
         </div>
         <div class="info">

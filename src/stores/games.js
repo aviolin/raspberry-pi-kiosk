@@ -59,8 +59,6 @@ async function getBoardGameCollection(username) {
     // Convert XML to JSON
     const json = xmlToJson(xmlDoc);
 
-    console.log(json)
-
         // Transform JSON to simplified collection format
     const formattedCollection = json.items.item.map(item => {
       return {
@@ -98,10 +96,7 @@ async function getBoardGameThing(id) {
     // Convert XML to JSON
     const json = xmlToJson(xmlDoc)?.items?.item;
 
-    console.log(json);
-
     const formattedThing = {
-        id: item["@attributes"].objectid,
         name: json.name ? json.name[0]['@attributes'].value : "Unknown",
         description: json.description ? json.description['#text'] : "No description available",
         image: json.image ? json.image['#text'] : null,
@@ -142,13 +137,10 @@ export const useGamesStore = defineStore('games', () => {
 
     const details = await getBoardGameThing(id);
     collection.value[itemIndex] = { ...collection.value[itemIndex], ...details, hasDetails: true };
-
-    console.log('here', details)
   }
 
   async function updateCollection(usernames) {
     collection.value = []
-    console.log(usernames)
     for (const username of usernames) {
       const coll = await getBoardGameCollection(username);
       collection.value = collection.value.concat(coll);

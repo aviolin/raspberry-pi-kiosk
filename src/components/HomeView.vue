@@ -15,8 +15,6 @@ const { updateCollection } = gamesStore;
 register(); // swiper
 
 onMounted(async () => {
-  window.location.href
-  console.log(window.location.href)
   const params = window.location.href.split('#')[1];
   if (! params) return;
 

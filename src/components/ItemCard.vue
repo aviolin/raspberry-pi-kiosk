@@ -1,16 +1,22 @@
 <script setup>
-import { RouterLink } from 'vue-router';
+import { ref } from 'vue';
+
+import ItemModal from './ItemModal.vue';
 import StarRating from './StarRating.vue';
 import NumPlayers from './NumPlayers.vue';
 import PlayTime from './PlayTime.vue';
 
+
 const props = defineProps({
     item: Object
 })
+
+const isModalOpen = ref(false);
+
 </script>
 
 <template>
-    <RouterLink :to="'/games/' + item.gameId" class="item-card">
+    <button class="item-card" @click="isModalOpen = true">
         <div class="image-holder">
             <img :src="item.image" :alt="item.name" />
             <!-- <button class="btn-like" aria-label="Like"></button> -->
@@ -21,7 +27,10 @@ const props = defineProps({
             <NumPlayers :min="item.minPlayers" :max="item.maxPlayers" />
             <PlayTime :time="item.playingTime" />
         </div>
-    </RouterLink>
+    </button>
+    <Teleport to="body">
+        <ItemModal v-if="isModalOpen" :item="item" @closeModal="isModalOpen = false" />
+    </Teleport>
 </template>
 
 <style scoped>
@@ -29,11 +38,16 @@ const props = defineProps({
     font-family: 'Arimo', sans-serif;
     color: var(--color-primary);
     text-decoration: none;
+    width: 30vw;
+    background: none;
+    border: 0;
+    text-align: left;
+    padding: 0;
 }
 .image-holder {
     width: 100%;
     max-width: 100%;
-    aspect-ratio: 4 / 5;
+    aspect-ratio: 4 / 4;
     background-color: #fff1;
     position: relative;
     transition: .3s;

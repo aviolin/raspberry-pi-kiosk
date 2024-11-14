@@ -68,4 +68,7 @@ onMounted(async () => {
 swiper-container {
   height: 100vh;
 }
+swiper-slide:not(.swiper-slide-active):not(.swiper-slide-next):not(.swiper-slide-prev) {
+    opacity: 0;
+}
 </style>

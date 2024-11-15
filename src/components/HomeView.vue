@@ -1,16 +1,19 @@
 <script setup>
-import { onMounted, ref } from 'vue';
-import { register } from 'swiper/element'
+import { onMounted, onUpdated, ref } from 'vue';
+import { register } from 'swiper/element/bundle'
 import { storeToRefs } from 'pinia';
 import { useGamesStore } from '@/stores/games';
 
+import FilterPanel from './FilterPanel.vue';
 import ItemCard from '../components/ItemCard.vue';
 
 const swiper = ref(null);
 
 const gamesStore = useGamesStore()
-const { collection, collectionSets } = storeToRefs(gamesStore);
+const { filteredCollection, collectionSets } = storeToRefs(gamesStore);
 const { updateCollection } = gamesStore;
+
+
 
 register(); // swiper
 
@@ -29,31 +32,36 @@ onMounted(async () => {
   });
 
   updateCollection(usernames);
-  
-  // swiper.value.initialize();
+
+  swiper.value.initialize();
+})
+
+onUpdated(() => {
+  console.log('hasdf')
 })
 
 </script>
 
 <template>
-    <!-- <FilterPanel /> -->
+    <FilterPanel />
     <div class="items">
         <div class="item-grid">
-          <ItemCard v-for="item in collection" :item="item" />
-          <!-- <swiper-container 
+          <swiper-container 
             :direction="'vertical'"
             :slides-per-view="1.2"
             :space-between="16"
             :centered-slides="true"
+            :pagination="true"
+            :pagination-clickable="true"
             :init="false"
             ref="swiper"
           >
             <swiper-slide v-for="(set, i) in collectionSets" :key="i">
               <div class="set">
-                <ItemCard v-for="item in collectionSets[i]" :item="item" />
+                <ItemCard v-for="item in set" :item="item" />
               </div>
             </swiper-slide>
-          </swiper-container> -->
+          </swiper-container>
         </div>
     </div>
 </template>
@@ -62,14 +70,15 @@ onMounted(async () => {
 .item-grid {
   height: 100vh;
 
-  display: grid;
+  /* display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  gap: 1rem;
+  gap: 1rem; */
 }
 .set {
   display: flex;
   gap: 1rem;
   justify-content: space-around;
+  padding-right: 42px;
 }
 swiper-container {
   height: 100vh;

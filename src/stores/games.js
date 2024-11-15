@@ -2,6 +2,7 @@ import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import xmlToJson from '@/xmlToJson'
 
+
 function transformPollData(pollData) {
   return {
       polls: pollData.map(poll => ({
@@ -118,17 +119,40 @@ async function getBoardGameThing(id) {
 export const useGamesStore = defineStore('games', () => {
   const collection = ref([])
 
+  const filteredCollection = computed(() => {
+
+    let _collection = collection.value
+
+    filterGroups.value.forEach(filter => {
+      if (filter.name === 'players') {
+        _collection = _collection.filter(item => {
+          const players = []
+          for (let i = item.minPlayers; i <= item.maxPlayers; i++) {
+            players.push(i)
+          }
+          return filter.activeValues.length === 0 || players.some(p => filter.activeValues.includes(p))
+        })
+      }
+    })
+
+    console.log('Filtered: ',_collection)
+    return _collection
+  })
+
   const collectionSets = computed(() => {
-    const sets = []
-    for (let i = 0; i < collection.value.length; i+=3) {
+
+    let sets = []
+    for (let i = 0; i < filteredCollection.value.length; i+=3) {
       const set = [
-        collection.value[i],
-        collection.value[i + 1],
-        collection.value[i + 2],
-        // collection.value[i + 3],
+        filteredCollection.value[i],
+        filteredCollection.value[i + 1],
+        filteredCollection.value[i + 2],
       ]
       sets.push(set)
     }
+
+    console.log('asfdasdf??', sets)
+
     return sets
   })
 
@@ -159,5 +183,21 @@ export const useGamesStore = defineStore('games', () => {
     collection.value = uniqueCollection
   }
 
-  return { collection, updateCollection, collectionSets, addItemDetails }
+  const filterGroups = ref([
+    { name: 'players', label: 'Players', values: [1, 2, 3, 4, 5, 6, 7, 8, 9], activeValues: [] },
+    // { name: 'playingTime', label: 'Playing Time', values: [], activeValues: [] },
+  ])
+
+  function applyFilter(_filter, value) {
+    _filter = filterGroups.value.find(f => f.name === _filter)
+    value = +value;
+    
+    if (_filter.activeValues.includes(value)) {
+        _filter.activeValues = _filter.activeValues.filter(v => v !== value)
+    } else {
+        _filter.activeValues.push(value)
+    }
+  }
+
+  return { collection, filteredCollection, updateCollection, collectionSets, addItemDetails, filterGroups, applyFilter }
 })

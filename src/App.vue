@@ -1,6 +1,20 @@
 <script setup>
+import { onMounted } from 'vue';
+
 import HomeView from './components/HomeView.vue';
+
+function isRaspbian() {
+  const userAgent = navigator.userAgent;
+  return userAgent.includes("Linux armv") || userAgent.includes("Raspberry Pi");
+}
+
+onMounted(() => {
+  if (isRaspbian()) {
+    document.body.classList.add('raspbian');
+  }
+});
 </script>
+
 
 <template>
   <HomeView />
@@ -13,6 +27,11 @@ import HomeView from './components/HomeView.vue';
 :root {
   --color-primary: #fff;
   --color-secondary: #3a293a;
+  --color-accent: orange;
+  --swiper-pagination-bullet-inactive-color: var(--color-primary);
+  --swiper-pagination-color: var(--color-primary);
+  --swiper-pagination-bullet-width: 24px;
+  --swiper-pagination-bullet-height: 24px;
 }
 
 ::-webkit-scrollbar {
@@ -61,13 +80,13 @@ body {
   margin: 0;
   color: var(--color-primary);
   background: var(--color-secondary);
-
-  @media(hover:none) {
-    cursor: none;
-  }
+  font-family: 'Arimo', sans-serif;
 }
 .wrapper {
   display: flex;
   gap: 2rem;
+}
+.raspbian {
+  cursor: none;
 }
 </style>

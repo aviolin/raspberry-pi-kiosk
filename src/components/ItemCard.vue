@@ -16,25 +16,29 @@ const isModalOpen = ref(false);
 </script>
 
 <template>
-    <button class="item-card" @click="isModalOpen = true">
-        <div class="image-holder">
-            <img :src="item.thumbnail" :alt="item.name" />
-        </div>
-        <div class="info">
-            <h1 class="header">{{ item.name }}</h1>
-            <!-- <StarRating :rating="item.averageRating" /> -->
-            <NumPlayers :min="item.minPlayers" :max="item.maxPlayers" />
-            <PlayTime :time="item.playingTime" />
-        </div>
+    <button 
+        class="item-card" 
+        @click="isModalOpen = true"
+    >
+        <template v-if="item">
+            <Teleport to="body">
+                <ItemModal v-if="isModalOpen" :item="item" @closeModal="isModalOpen = false" />
+            </Teleport>
+            <div class="image-holder">
+                <img :src="item.thumbnail" :alt="item.name" />
+            </div>
+            <div class="info">
+                <h1 class="header">{{ item.name }}</h1>
+                <!-- <StarRating :rating="item.averageRating" /> -->
+                <NumPlayers :min="item.minPlayers" :max="item.maxPlayers" />
+                <PlayTime :time="item.playingTime" />
+            </div>
+        </template>
     </button>
-    <Teleport to="body">
-        <ItemModal v-if="isModalOpen" :item="item" @closeModal="isModalOpen = false" />
-    </Teleport>
 </template>
 
 <style scoped>
 .item-card {
-    font-family: 'Arimo', sans-serif;
     color: var(--color-primary);
     text-decoration: none;
     /* width: 30vw; */

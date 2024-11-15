@@ -120,11 +120,12 @@ export const useGamesStore = defineStore('games', () => {
 
   const collectionSets = computed(() => {
     const sets = []
-    for (let i = 0; i < collection.value.length; i+=3) {
+    for (let i = 0; i < collection.value.length; i+=4) {
       const set = [
         collection.value[i],
         collection.value[i + 1],
         collection.value[i + 2],
+        collection.value[i + 3],
       ]
       sets.push(set)
     }

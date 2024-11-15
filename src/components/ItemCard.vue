@@ -18,12 +18,11 @@ const isModalOpen = ref(false);
 <template>
     <button class="item-card" @click="isModalOpen = true">
         <div class="image-holder">
-            <img :src="item.thumbnail" :alt="item.name" />
-            <!-- <button class="btn-like" aria-label="Like"></button> -->
+            <!-- <img :src="item.thumbnail" :alt="item.name" /> -->
         </div>
         <div class="info">
             <h1 class="header">{{ item.name }}</h1>
-            <StarRating :rating="item.averageRating" />
+            <!-- <StarRating :rating="item.averageRating" /> -->
             <NumPlayers :min="item.minPlayers" :max="item.maxPlayers" />
             <PlayTime :time="item.playingTime" />
         </div>
@@ -38,7 +37,8 @@ const isModalOpen = ref(false);
     font-family: 'Arimo', sans-serif;
     color: var(--color-primary);
     text-decoration: none;
-    width: 30vw;
+    /* width: 30vw; */
+    flex: 1;
     background: none;
     border: 0;
     text-align: left;

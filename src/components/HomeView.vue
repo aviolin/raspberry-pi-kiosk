@@ -63,6 +63,7 @@ onMounted(async () => {
 }
 .set {
   display: flex;
+  gap: 1rem;
   justify-content: space-around;
 }
 swiper-container {

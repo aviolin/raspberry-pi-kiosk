@@ -9,7 +9,7 @@ import ItemCard from '../components/ItemCard.vue';
 const swiper = ref(null);
 
 const gamesStore = useGamesStore()
-const { collectionSets } = storeToRefs(gamesStore);
+const { collection, collectionSets } = storeToRefs(gamesStore);
 const { updateCollection } = gamesStore;
 
 register(); // swiper
@@ -30,7 +30,7 @@ onMounted(async () => {
 
   updateCollection(usernames);
   
-  swiper.value.initialize();
+  // swiper.value.initialize();
 })
 
 </script>
@@ -39,7 +39,8 @@ onMounted(async () => {
     <!-- <FilterPanel /> -->
     <div class="items">
         <div class="item-grid">
-          <swiper-container 
+          <ItemCard v-for="item in collection" :item="item" />
+          <!-- <swiper-container 
             :direction="'vertical'"
             :slides-per-view="1.2"
             :space-between="16"
@@ -52,7 +53,7 @@ onMounted(async () => {
                 <ItemCard v-for="item in collectionSets[i]" :item="item" />
               </div>
             </swiper-slide>
-          </swiper-container>
+          </swiper-container> -->
         </div>
     </div>
 </template>
@@ -60,6 +61,10 @@ onMounted(async () => {
 <style>
 .item-grid {
   height: 100vh;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
 }
 .set {
   display: flex;

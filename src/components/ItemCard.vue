@@ -18,7 +18,7 @@ const isModalOpen = ref(false);
 <template>
     <button class="item-card" @click="isModalOpen = true">
         <div class="image-holder">
-            <!-- <img :src="item.thumbnail" :alt="item.name" /> -->
+            <img :src="item.thumbnail" :alt="item.name" />
         </div>
         <div class="info">
             <h1 class="header">{{ item.name }}</h1>

@@ -46,7 +46,7 @@ function transformPollData(pollData) {
 }
 
 async function getBoardGameCollection(username) {
-  const url = `https://boardgamegeek.com/xmlapi2/collection?username=${username}&stats=1`;
+  const url = `https://boardgamegeek.com/xmlapi2/collection?username=${username}&stats=1&excludesubtype=boardgameexpansion`;
 
   try {
     // Fetch the XML data
@@ -60,10 +60,13 @@ async function getBoardGameCollection(username) {
     // Convert XML to JSON
     const json = xmlToJson(xmlDoc);
 
+    console.log('here',json);
+
         // Transform JSON to simplified collection format
     const formattedCollection = json.items.item.map(item => {
       return {
         id: item["@attributes"].objectid,
+        type: item["@attributes"].subtype === "boardgame" ? 1 : 2,
         name: item.name ? item.name["#text"] : "Unknown",
         description: item.description ? item.description["#text"] : "No description available",
         yearPublished: item.yearpublished ? item.yearpublished["#text"] : "Unknown",
@@ -132,6 +135,11 @@ export const useGamesStore = defineStore('games', () => {
           }
           return filter.activeValues.length === 0 || players.some(p => filter.activeValues.includes(p))
         })
+      } else if (filter.name === 'type') {
+
+        _collection = _collection.filter(item => {
+          return filter.activeValues.length === 0 || filter.activeValues.includes(item.type)
+        })
       }
     })
 
@@ -150,8 +158,6 @@ export const useGamesStore = defineStore('games', () => {
       ]
       sets.push(set)
     }
-
-    console.log('asfdasdf??', sets)
 
     return sets
   })
@@ -185,6 +191,7 @@ export const useGamesStore = defineStore('games', () => {
 
   const filterGroups = ref([
     { name: 'players', label: 'Players', values: [1, 2, 3, 4, 5, 6, 7, 8, 9], activeValues: [] },
+    // { name: 'type', label: 'Type', values: [1, 2], activeValues: [] },
     // { name: 'playingTime', label: 'Playing Time', values: [], activeValues: [] },
   ])
 

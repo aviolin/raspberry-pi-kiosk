@@ -12,7 +12,6 @@ const isModalOpen = ref(false);
 
 const updateFilter = (e) => {
     applyFilter(e.target.dataset.group, e.target.dataset.value);
-    console.log(filterGroups.value);
 }
 
 </script>

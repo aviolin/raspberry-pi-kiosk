@@ -89,4 +89,7 @@ body {
 .raspbian {
   cursor: none;
 }
+.swiper-pagination-vertical.swiper-pagination-bullets.swiper-pagination-bullets-dynamic, .swiper-vertical>.swiper-pagination-bullets.swiper-pagination-bullets-dynamic {
+  width: 24px !important;
+}
 </style>

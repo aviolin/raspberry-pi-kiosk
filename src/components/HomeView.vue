@@ -17,6 +17,17 @@ const { updateCollection } = gamesStore;
 
 register(); // swiper
 
+
+const swiperParams = {
+    injectStyles: [
+      `
+      :host .swiper-pagination {
+        width: 24px !important;
+      }
+      `,
+    ],
+  };
+
 onMounted(async () => {
   const params = window.location.href.split('#')[1];
   if (! params) return;
@@ -33,11 +44,8 @@ onMounted(async () => {
 
   updateCollection(usernames);
 
+  Object.assign(swiper.value, swiperParams);
   swiper.value.initialize();
-})
-
-onUpdated(() => {
-  console.log('hasdf')
 })
 
 </script>
@@ -53,6 +61,8 @@ onUpdated(() => {
             :centered-slides="true"
             :pagination="true"
             :pagination-clickable="true"
+            :pagination-dynamic-bullets="true"
+            :pagination-dynamic-main-bullets="10"
             :init="false"
             ref="swiper"
           >
@@ -69,10 +79,6 @@ onUpdated(() => {
 <style>
 .item-grid {
   height: 100vh;
-
-  /* display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 1rem; */
 }
 .set {
   display: flex;

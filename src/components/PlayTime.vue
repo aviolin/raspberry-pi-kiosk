@@ -1,6 +1,6 @@
 <script setup>
 const props = defineProps({
-    time: Number
+    time: Number | String
 })
 </script>
 

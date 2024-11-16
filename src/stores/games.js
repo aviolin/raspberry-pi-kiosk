@@ -2,7 +2,6 @@ import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import xmlToJson from '@/xmlToJson'
 
-
 function transformPollData(pollData) {
   return {
       polls: pollData.map(poll => ({
@@ -60,9 +59,7 @@ async function getBoardGameCollection(username) {
     // Convert XML to JSON
     const json = xmlToJson(xmlDoc);
 
-    console.log('here',json);
-
-        // Transform JSON to simplified collection format
+    // Transform JSON to simplified collection format
     const formattedCollection = json.items.item.map(item => {
       return {
         id: item["@attributes"].objectid,
@@ -85,8 +82,9 @@ async function getBoardGameCollection(username) {
   }
 }
 
-async function getBoardGameThing(id) {
-  const url = `https://boardgamegeek.com/xmlapi2/thing?id=${id}`;
+async function getBoardGameThings(ids) {
+  const idsString = Array.isArray(ids) ? ids.join(",") : ids;
+  const url = `https://boardgamegeek.com/xmlapi2/thing?id=${idsString}`;
 
   try {
     // Fetch the XML data
@@ -98,22 +96,31 @@ async function getBoardGameThing(id) {
     const xmlDoc = parser.parseFromString(xmlData, "application/xml");
 
     // Convert XML to JSON
-    const json = xmlToJson(xmlDoc)?.items?.item;
+    const json = xmlToJson(xmlDoc)?.items;
 
-    const formattedThing = {
-        name: json.name ? json.name[0]['@attributes'].value : "Unknown",
-        description: json.description ? json.description['#text'] : "No description available",
-        image: json.image ? json.image['#text'] : null,
-        minPlayers: json.minplayers ? parseInt(json.minplayers['@attributes'].value) : "Unknown",
-        maxPlayers: json.maxplayers ? parseInt(json.maxplayers['@attributes'].value) : "Unknown",
-        minPlaytime: json.minplaytime ? parseInt(json.minplaytime['@attributes'].value) : "Unknown",
-        maxPlaytime: json.maxplaytime ? parseInt(json.maxplaytime['@attributes'].value) : "Unknown",
-        playingTime: json.playingtime ? parseInt(json.playingtime['@attributes'].value) : "Unknown",
-        yearPublished: json.yearpublished ? parseInt(json.yearpublished['@attributes'].value) : "Unknown",
-        polls: transformPollData(json.poll)
+    if (!Array.isArray(json.item)) {
+      json.item = [json.item];
     }
 
-    return formattedThing;
+    const formattedThings = json.item.map(item => {
+      return {
+          id: item["@attributes"].id,
+          name: item.name[0] ? item.name[0]['@attributes'].value : item.name ? item.name['@attributes'].value : "Unknown",
+          description: item.description ? item.description['#text'] : "No description available",
+          image: item.image ? item.image['#text'] : null,
+          minPlayers: item.minplayers ? parseInt(item.minplayers['@attributes'].value) : "Unknown",
+          maxPlayers: item.maxplayers ? parseInt(item.maxplayers['@attributes'].value) : "Unknown",
+          minPlaytime: item.minplaytime ? parseInt(item.minplaytime['@attributes'].value) : "Unknown",
+          maxPlaytime: item.maxplaytime ? parseInt(item.maxplaytime['@attributes'].value) : "Unknown",
+          playingTime: item.playingtime ? parseInt(item.playingtime['@attributes'].value) : "Unknown",
+          yearPublished: item.yearpublished ? parseInt(item.yearpublished['@attributes'].value) : "Unknown",
+          polls: transformPollData(item.poll),
+          categories: item.link.filter(link => link['@attributes'].type === 'boardgamecategory').map(link => link['@attributes'].value),
+      }
+
+    })
+
+    return formattedThings;
   } catch (error) {
     console.error("Error fetching or parsing data:", error);
   }
@@ -143,7 +150,6 @@ export const useGamesStore = defineStore('games', () => {
       }
     })
 
-    console.log('Filtered: ',_collection)
     return _collection
   })
 
@@ -162,12 +168,56 @@ export const useGamesStore = defineStore('games', () => {
     return sets
   })
 
-  async function addItemDetails(id) {
-    const itemIndex = collection.value.findIndex(item => item.id === id);
-    if (!itemIndex || collection.value[itemIndex].hasDetails) return;
+  const collectionCategories = computed(() => {
+    const categories = filteredCollection.value.reduce((acc, item) => {
+      const itemCategories = Array.isArray(item.categories) ? item.categories : [item.categories];
+      
+      itemCategories.forEach(category => {
+        if (!acc.some(c => c.name === category)) {
+          acc.push({
+            name: category,
+            items: []
+          });
+        }
+      });
+      return acc;
+    }, []);
 
-    const details = await getBoardGameThing(id);
-    collection.value[itemIndex] = { ...collection.value[itemIndex], ...details, hasDetails: true };
+    categories.push({
+      name: 'Uncategorized',
+      items: filteredCollection.value.filter(item => !item.categories || !item.categories.length)
+    })
+  
+    filteredCollection.value.forEach(item => {
+      const itemCategories = Array.isArray(item.categories) ? item.categories : [item.categories];
+      
+      itemCategories.forEach(category => {
+        const cat = categories.find(c => c.name === category);
+        cat.items.push(item);
+      });
+    });
+
+    categories.sort((a, b) => {
+      return a.name.localeCompare(b.name, 'ja')
+    });
+  
+    return categories;
+  });
+  
+  async function addItemDetails(ids) {
+
+    const details = await getBoardGameThings(ids);
+
+    if (Array.isArray(ids)) {
+      ids.forEach(i => {
+        const index = collection.value.findIndex(item => item.id === i);
+        collection.value[index] = { ...collection.value[index], ...details.find(item => item.id === i), hasDetails: true };
+      })
+    } else {
+      const itemIndex = collection.value.findIndex(item => item.id === ids);
+      // if (!itemIndex || collection.value[itemIndex].hasDetails) return;
+      collection.value[itemIndex] = { ...collection.value[itemIndex], ...details, hasDetails: true };
+    }
   }
 
   async function updateCollection(usernames) {
@@ -206,5 +256,5 @@ export const useGamesStore = defineStore('games', () => {
     }
   }
 
-  return { collection, filteredCollection, updateCollection, collectionSets, addItemDetails, filterGroups, applyFilter }
+  return { collection, filteredCollection, collectionCategories, updateCollection, collectionSets, addItemDetails, filterGroups, applyFilter }
 })

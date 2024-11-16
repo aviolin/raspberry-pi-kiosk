@@ -9,9 +9,14 @@ const { filterGroups } = storeToRefs(gamesStore);
 const { applyFilter } = gamesStore;
 
 const isModalOpen = ref(false);
+const isLoading = ref(false);
 
 const updateFilter = (e) => {
-    applyFilter(e.target.dataset.group, e.target.dataset.value);
+    isLoading.value = true;
+    setTimeout(() => {
+        applyFilter(e.target.dataset.group, e.target.dataset.value);
+        isLoading.value = false;
+    })
 }
 
 </script>
@@ -27,6 +32,7 @@ const updateFilter = (e) => {
             <rect x="13" y="17" width="8" height="2" rx="1" />
         </svg>
     </button>
+    <div class="loader" v-if="isLoading"></div>
     <div class="overlay" v-if="isModalOpen"></div>
     <div class="sidebar" v-if="isModalOpen">
         <button class="btn btn-close" @click="isModalOpen = !isModalOpen">
@@ -56,8 +62,8 @@ const updateFilter = (e) => {
 .btn {
     background: #fff1;
     border: 0;
-    width: 40px;
-    height: 40px;
+    width: 58px;
+    height: 58px;
     color: var(--color-primary);
 }
 .btn-filter {
@@ -81,7 +87,8 @@ const updateFilter = (e) => {
   background: var(--color-primary);
   color: var(--color-secondary);
 }
-.overlay {
+.overlay,
+.loader {
     position: fixed;
     top: 0;
     left: 0;
@@ -89,6 +96,9 @@ const updateFilter = (e) => {
     height: 100vh;
     background: rgba(0, 0, 0, 0.5);
     z-index: 35;
+}
+.loader {
+    z-index:9999;
 }
 .panel {
     display: flex;
@@ -102,7 +112,7 @@ const updateFilter = (e) => {
     overflow: auto;
 }
 header {
-    font-size: 1.3rem;
+    font-size: 1.5rem;
     font-weight: bold;
     margin-bottom: 0.5rem;
 }
@@ -112,20 +122,21 @@ header {
 
 .checkbox-wrapper {
     position: relative;
-    height:32px;
+    height:48px;
     display: flex;
     align-items: center;
 }
 .checkbox-wrapper label {
-    padding-left: 2.5rem;
+    padding-left: 4rem;
+    font-size: 1.5rem;
 }
 .checkbox-wrapper label::after {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
-    width: 24px;
-    height: 24px;
+    width: 40px;
+    height: 40px;
     border-radius: 0.25rem;
     border: 1px solid var(--color-secondary);
 }

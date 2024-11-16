@@ -30,8 +30,8 @@ onMounted(() => {
   --color-accent: orange;
   --swiper-pagination-bullet-inactive-color: var(--color-primary);
   --swiper-pagination-color: var(--color-primary);
-  --swiper-pagination-bullet-width: 24px;
-  --swiper-pagination-bullet-height: 24px;
+  --swiper-pagination-bullet-width: 36px;
+  --swiper-pagination-bullet-height: 36px;
 }
 
 ::-webkit-scrollbar {
@@ -88,8 +88,5 @@ body {
 }
 .raspbian {
   cursor: none;
-}
-.swiper-pagination-vertical.swiper-pagination-bullets.swiper-pagination-bullets-dynamic, .swiper-vertical>.swiper-pagination-bullets.swiper-pagination-bullets-dynamic {
-  width: 24px !important;
 }
 </style>

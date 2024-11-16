@@ -8,7 +8,13 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 export default defineConfig({
   base: "/raspberry-pi-kiosk/",
   plugins: [
-    vue(),
+    vue({
+      template: {
+        compilerOptions: {
+          isCustomElement: (tag) => tag.startsWith('swiper-')
+        }
+      }
+    }),
     vueDevTools(),
   ],
   resolve: {

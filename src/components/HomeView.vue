@@ -10,9 +10,8 @@ import ItemCard from '../components/ItemCard.vue';
 const swiper = ref(null);
 
 const gamesStore = useGamesStore()
-const { filteredCollection, collectionSets } = storeToRefs(gamesStore);
-const { updateCollection } = gamesStore;
-
+const { collection, collectionCategories, collectionSets } = storeToRefs(gamesStore);
+const { updateCollection, addItemDetails } = gamesStore;
 
 
 register(); // swiper
@@ -22,7 +21,7 @@ const swiperParams = {
     injectStyles: [
       `
       :host .swiper-pagination {
-        width: 24px !important;
+        width: 40px !important;
       }
       `,
     ],
@@ -42,7 +41,13 @@ onMounted(async () => {
     }
   });
 
-  updateCollection(usernames);
+  await updateCollection(usernames);
+
+  const _collection = [...collection.value];
+
+  while(_collection.length) {
+      await addItemDetails(_collection.splice(0,20).map(item => item.id));
+  }
 
   Object.assign(swiper.value, swiperParams);
   swiper.value.initialize();
@@ -56,20 +61,30 @@ onMounted(async () => {
         <div class="item-grid">
           <swiper-container 
             :direction="'vertical'"
-            :slides-per-view="1.2"
+            :slides-per-view="1.3"
             :space-between="16"
             :centered-slides="true"
             :pagination="true"
             :pagination-clickable="true"
             :pagination-dynamic-bullets="true"
-            :pagination-dynamic-main-bullets="10"
+            :pagination-dynamic-main-bullets="5"
             :init="false"
             ref="swiper"
           >
-            <swiper-slide v-for="(set, i) in collectionSets" :key="i">
-              <div class="set">
-                <ItemCard v-for="item in set" :item="item" />
-              </div>
+            <swiper-slide v-for="(category, i) in collectionCategories" :key="i">
+              <header class="category-header">{{ category.name }}</header>
+              <swiper-container
+                :direction="'horizontal'"
+                :slides-per-view="4.3"
+                :space-between="16"
+                :centered-slides="false"
+                :slides-per-group="3"
+                :init="true"
+                >
+                <swiper-slide v-for="(item, i) in category.items" :key="i">
+                  <ItemCard :item="item" />
+                </swiper-slide>
+              </swiper-container>
             </swiper-slide>
           </swiper-container>
         </div>
@@ -89,7 +104,16 @@ onMounted(async () => {
 swiper-container {
   height: 100vh;
 }
-swiper-slide:not(.swiper-slide-active):not(.swiper-slide-next):not(.swiper-slide-prev) {
-    opacity: 0;
+swiper-slide.swiper-slide-next + swiper-slide + swiper-slide + swiper-slide {
+  opacity: .5;
 }
+.category-header {
+  margin-left: 1rem;
+  margin-bottom: 1rem;
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+/* swiper-slide:not(.swiper-slide-active):not(.swiper-slide-next):not(.swiper-slide-prev) {
+    opacity: 0;
+} */
 </style>

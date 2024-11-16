@@ -41,7 +41,7 @@ const isModalOpen = ref(false);
 .item-card {
     color: var(--color-primary);
     text-decoration: none;
-    /* width: 30vw; */
+    width: 100%;
     flex: 1;
     background: none;
     border: 0;
